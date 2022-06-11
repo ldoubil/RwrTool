@@ -28,6 +28,9 @@ namespace RwrTool
         private void AppRun(object sender, RoutedEventArgs e)
         {
             //主页面准备完成开始执行
+            //导入xml
+            string xml_url = "C:\\Users\\baika\\Desktop\\rwrmod\\mod\\happy_server_extend\\models\\hp_ak105.xml";
+
 
         }
     }
