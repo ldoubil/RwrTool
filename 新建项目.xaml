@@ -1,0 +1,68 @@
+﻿<Window
+    x:Class="RwrTool.新建项目"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RwrTool"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="新建项目"
+    Width="800"
+    Height="450"
+    AllowsTransparency="True"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    WindowStyle="None"
+    mc:Ignorable="d">
+    <Grid Background="#FF6B6B6B">
+        <DockPanel LastChildFill="False">
+
+            <Grid DockPanel.Dock="Top">
+                <StackPanel Width="auto" Height="auto">
+                    <Grid
+                        Height="15"
+                        Background="Black"
+                        MouseLeftButtonDown="Grid_MouseLeftButtonDown" />
+                    <Label>
+                        输入项目名
+                    </Label>
+                    <TextBox
+                        Grid.Row="1"
+                        Margin="0,12,0,0"
+                        Cursor="Arrow"
+                        Text="Name... ..." />
+                    <StackPanel x:Name="url_list" />
+                    <Button Content="添加项目资源路径" Click="Button_Click" />
+                    <TextBlock>项目资源路径应包括Vanilla目录 和 制作的模组目录,如果基于别的模组制作还要添加别的模组目录进去!</TextBlock>
+                </StackPanel>
+            </Grid>
+
+
+
+
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    Margin="-1,0,0,0"
+                    Padding="40,4,40,4"
+                    HorizontalAlignment="Center"
+                    Content="取消"
+                    IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    ToolTip="Resource name: MaterialDesignRaisedButton" />
+                <Button
+                    Grid.Column="1"
+                    Padding="40,4,40,8"
+                    HorizontalAlignment="Center"
+                    Content="创建"
+                    IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                    ToolTip="Resource name: MaterialDesignRaisedSecondaryButton" />
+            </Grid>
+
+        </DockPanel>
+    </Grid>
+</Window>

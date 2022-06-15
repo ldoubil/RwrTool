@@ -1,31 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml;
-using System.Timers;
 using System.Windows.Threading;
-
-
+using System.IO;
+using RwrTool.KevinTool.Xml_Data_Structure;
+using RwrTool.KevinTool;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 
 namespace RwrTool
 {
-    
 
-    
+
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -51,128 +42,16 @@ namespace RwrTool
         public MainWindow()
         {
             InitializeComponent();
-
+            
         }
+
 
         private void AppRun(object sender, EventArgs e)
         {
-            //主页面准备完成开始执行
-            //导入xml
-            string xml_url = "C:\\Users\\baika\\Desktop\\rwrmod\\mod\\happy_server_extend\\models\\hp_ak105.xml";
-            XmlDocument xmlDocument = new XmlDocument();
-            //根据目录获取内容
-            XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-            xmlReaderSettings.IgnoreComments = true; //忽略文档注释
-            XmlReader xmlReader = XmlReader.Create(xml_url, xmlReaderSettings);
-            xmlDocument.Load(xmlReader);
-
-            //获取root节点
-
-            XmlNode xmlNode = xmlDocument.SelectSingleNode("model");
-
-            XmlNode xmlNode1 = xmlNode.SelectSingleNode("voxels");
-
-            XmlNodeList xmlNodeList = xmlNode1.ChildNodes;
-            Debug.WriteLine("测试");
-            foreach (XmlNode xmlNode2 in xmlNodeList)
-            {
-                XmlElement xmlElement = (XmlElement)xmlNode2;
-                Debug.WriteLine(xmlElement.GetAttribute("x"));
-
-            }
-
-
-
-
-
-            //底面三角网格
-            MeshGeometry3D bottom_mesh = new MeshGeometry3D() { Positions = new Point3DCollection(), TriangleIndices = new Int32Collection() };
-            //顶面三角网格
-            MeshGeometry3D top_mesh = new MeshGeometry3D() { Positions = new Point3DCollection(), TriangleIndices = new Int32Collection() };
-            //侧面三角网格
-            MeshGeometry3D side_mesh = new MeshGeometry3D() { Positions = new Point3DCollection(), TriangleIndices = new Int32Collection() };
-
-            Point3D bottom_center = new Point3D(0, 0, 0);//底面中心
-            Point3D top_center = new Point3D(0, 2, 0);//顶面中心
-            top_mesh.Positions.Add(top_center);
-            bottom_mesh.Positions.Add(bottom_center);
-
-            int parts = 50;//把圆切成50份
-            double angle = Math.PI * 2 / parts;
-            for (int i = 0; i < parts; i++)
-            {
-                double x1 = 1 * Math.Cos(angle * i);
-                double z1 = 1 * Math.Sin(angle * i);
-                double x2 = 1 * Math.Cos(angle * (i + 1));
-                double z2 = 1 * Math.Sin(angle * (i + 1));
-
-                Point3D bottom1 = new Point3D(x1, 0, z1);//底面
-                Point3D bottom2 = new Point3D(x2, 0, z2);
-                Point3D top1 = new Point3D(x1, 2, z1);
-                Point3D top2 = new Point3D(x2, 2, z2);
-
-                //底面
-                bottom_mesh.Positions.Add(bottom1);
-                bottom_mesh.Positions.Add(bottom2);
-
-                bottom_mesh.TriangleIndices.Add(i * 2 + 1);
-                bottom_mesh.TriangleIndices.Add(i * 2 + 2);
-                bottom_mesh.TriangleIndices.Add(0);
-
-                //顶面
-                top_mesh.Positions.Add(top1);
-                top_mesh.Positions.Add(top2);
-
-                top_mesh.TriangleIndices.Add(i * 2 + 2);
-                top_mesh.TriangleIndices.Add(i * 2 + 1);
-                top_mesh.TriangleIndices.Add(0);
-
-                //侧面
-                if (i == 0)
-                {
-                    side_mesh.Positions.Add(bottom1);
-                    side_mesh.Positions.Add(top1);
-                }
-                side_mesh.Positions.Add(bottom2);
-                side_mesh.Positions.Add(top2);
-
-                side_mesh.TriangleIndices.Add(i * 2 + 1);
-                side_mesh.TriangleIndices.Add(i * 2 + 3);
-                side_mesh.TriangleIndices.Add(i * 2 + 2);
-
-                side_mesh.TriangleIndices.Add(i * 2 + 1);
-                side_mesh.TriangleIndices.Add(i * 2 + 2);
-                side_mesh.TriangleIndices.Add(i * 2 + 0);
-            }
-
-            DiffuseMaterial bottom_material = new DiffuseMaterial(Brushes.Aqua);//底面绿色
-            DiffuseMaterial top_material = new DiffuseMaterial(Brushes.Red);//顶面蓝色
-            DiffuseMaterial side_material = new DiffuseMaterial(Brushes.Cyan);//侧面红色
-
-            GeometryModel3D top = new GeometryModel3D(top_mesh, top_material);
-            GeometryModel3D bottom = new GeometryModel3D(bottom_mesh, bottom_material);
-            GeometryModel3D side = new GeometryModel3D(side_mesh, side_material);
-            //相机
-            Camera camera = new PerspectiveCamera(new Point3D(3, 6, 10), new Vector3D(-3, -6, -10), new Vector3D(0, 1, 0), 45);
-            //光源
-            Light light = new AmbientLight(Colors.White);
-
-            Model3DGroup group = new Model3DGroup();
-            group.Children.Add(light);
-            group.Children.Add(top);
-            group.Children.Add(bottom);
-            group.Children.Add(side);
-
-            RotateTransform3D rotateTransform3D = new RotateTransform3D( );
-            AxisAngleRotation3D axisAngleRotation3D = new AxisAngleRotation3D(new Vector3D(0,1,2),20);
-            rotateTransform3D.Rotation = axisAngleRotation3D;
-            ModelVisual3D model = new ModelVisual3D();
-            model.Content = group;
-            model.Transform = rotateTransform3D;
             
-            view3d.Children.Add(model);
-            
-            view3d.Camera = camera;
+
+
+
             
 
             //创建一个定时
@@ -180,60 +59,223 @@ namespace RwrTool
 
         private void win_loaded(object sender, RoutedEventArgs e)
         {
-            m_Timer1s = new DispatcherTimer();
-            m_Timer1s.Interval = new TimeSpan(0, 0, 0, 0,1);
-            m_Timer1s.Tick += Timer1s_Tick;
-            m_Timer1s.IsEnabled = true;
-            //m_Timer1s.Stop();
-            m_Timer1s.Start();
-        }
-        int a = 0;
-        private void Timer1s_Tick(object sender, EventArgs e)//计时执行的程序
-        {
-            switch (_state)
-            {
-                case State.Start: //开始
-                    {
-                        _timeSpan += new TimeSpan(0, 0, 0, 0,1);
-                    }
-                    break;
-                case State.Pause: //暂停
-                    {
 
-                    }
-                    break;
-                case State.End: //结束
-                    {
-                        _timeSpan = new TimeSpan(); //结束完就归零，重新开始
-                        //_timeSpan = new TimeSpan(0, 23, 12, 45, 54);
-                    }
-                    break;
-            }
-            var time = string.Format("{0:00}:{1:00}:{2:00}", _timeSpan.Hours, _timeSpan.Minutes, _timeSpan.Seconds);
-            Debug.WriteLine(time);
-            a++;
-            Camera camera = new PerspectiveCamera(new Point3D(3, 6, 10), new Vector3D(-3, -6, -10), new Vector3D(0, 1, 0), 45);
-            //view3d.Camera = camera;
-            foreach (var item in view3d.Children)
-            {
-                RotateTransform3D rotateTransform3D = new RotateTransform3D();
-                AxisAngleRotation3D axisAngleRotation3D = new AxisAngleRotation3D(new Vector3D(KevinTool.Kevin.GetRandomNumber(0, 5, 1), KevinTool.Kevin.GetRandomNumber(0, 5, 1), KevinTool.Kevin.GetRandomNumber(0, 5, 1)), 20);
-                rotateTransform3D.Rotation = axisAngleRotation3D;
-                item.Transform = rotateTransform3D;
-            }
-            Debug.WriteLine(view3d.Children);
-        }
-
-        private void view3d_MouseDown(object sender, MouseButtonEventArgs e)
-        {
             
-            foreach (var item in view3d.Children)
+         //   var jo = new JsonObject
+         //   {
+         //       ["Message"] = "个人信息",
+         //       ["Father"] = new JsonObject { ["Name"] = "张三" },
+         //       ["Son"] = new JsonArray(
+         //new JsonObject
+         //{
+         //    ["Name"] = "张小小",
+         //    ["Pet"] = new JsonArray("小花狗", "小花猫"),
+         //    ["Age"] = ""
+         //},
+         //new JsonObject
+         //{
+         //    ["Name"] = "张大大",
+         //    ["Pet"] = new JsonArray("小狼狗", "小公鸡"),
+         //    ["Age"] = 2
+         //})
+         //   };
+         //   var js = jo.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+         //   Debug.WriteLine(js);
+
+        }
+
+        
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("鼠标左键");
+        }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("鼠标左键");
+            //执行移动
+            this.DragMove();
+        }
+
+
+
+
+
+        private void exitapp(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("软件退出");
+            this.Close();
+        }
+
+        private void BtnWindowMax_Click(object sender, RoutedEventArgs e)
+        {
+            //判断是否以及最大化，最大化就还原窗口，否则最大化
+            if (this.WindowState == WindowState.Maximized)
+                this.WindowState = WindowState.Normal;
+            else
+                this.WindowState = WindowState.Maximized;
+
+        }
+
+        private void ColorZone_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Title = "选择RWR模型文件";
+            openFileDialog.Filter = "RWR武器模型文件|*.xml";
+            openFileDialog.FileName = string.Empty;
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.Multiselect = false;
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.DefaultExt = "xml";
+            if (openFileDialog.ShowDialog() == false)
             {
-                RotateTransform3D rotateTransform3D = new RotateTransform3D();
-                AxisAngleRotation3D axisAngleRotation3D = new AxisAngleRotation3D(new Vector3D(KevinTool.Kevin.GetRandomNumber(0,5,1), KevinTool.Kevin.GetRandomNumber(0, 5, 1), KevinTool.Kevin.GetRandomNumber(0, 5, 1)), 20);
-                rotateTransform3D.Rotation = axisAngleRotation3D;
-                Debug.WriteLine(item.Transform = rotateTransform3D);
+                return;
             }
+            string txtFile = openFileDialog.FileName;
+            Debug.Write(txtFile);
+
+
+
+            //主页面准备完成开始执行
+            //导入xml
+            string xml_url = txtFile;
+           KevinTool.Kevin.模型_ADD(vi3d,xml_url);
+
+           
+
+        }
+        public void 按钮测试(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("按钮测试");
+            var ss = sender as Button;
+
+            var SSD = ss.DataContext as 武器模型预览;
+            //Debug.WriteLine(SSD.ID+SSD.img);
+            //KevinTool.Kevin.模型_ADD(vi3d, @"D:\steam\steamapps\workshop\content\270150\2513537759\media\packages\GFLNP\models\" + SSD.MXurl);
+            tablist.SelectedIndex = 1;
+        }
+        private void 打开项目_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog l = new System.Windows.Forms.FolderBrowserDialog();
+
+            if (l.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string txtFile = l.SelectedPath;
+                Debug.WriteLine(txtFile);
+                DirectoryInfo root = new DirectoryInfo(txtFile);
+                FileInfo[] fileStreams =  root.GetFiles();
+                foreach (var item in fileStreams)
+                {
+
+                    var ssss = System.IO.Path.GetExtension(item.FullName);
+                    if (ssss == ".weapon")
+                    {
+                        Debug.WriteLine(item.FullName);
+                        XmlDocument xmlDoc = new XmlDocument();
+                        XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
+                        xmlReaderSettings.IgnoreWhitespace = true;
+                        XmlReader xmlReader = XmlReader.Create(item.FullName, xmlReaderSettings);
+                        xmlDoc.Load(xmlReader);
+
+                        XmlNode xmlweapon = Kevin.xml_get_root(xmlDoc,"weapon");
+                        XmlNode xmltag = Kevin.xml_get_root(xmlDoc, "weapon/tag");
+                        XmlNode xmlspecification = Kevin.xml_get_root(xmlDoc, "weapon/specification");
+                        XmlNode next_in_chain = Kevin.xml_get_root(xmlDoc, "weapon/next_in_chain");
+                        XmlNode xmleffect = Kevin.xml_get_root(xmlDoc, "weapon/effect");
+                        XmlNode xmlanimation = Kevin.xml_get_root(xmlDoc,"weapon/animation");
+                        XmlNode xmlsound = Kevin.xml_get_root(xmlDoc,"weapon/sound");
+                        XmlNode xmlhud_icon = Kevin.xml_get_root(xmlDoc,"weapon/hud_icon");
+                        XmlNode xmlinventory = Kevin.xml_get_root(xmlDoc,"weapon/inventory");
+                        XmlNode xmlprojectile = Kevin.xml_get_root(xmlDoc,"weapon/projectile");
+                        XmlNode xmlprojectileresult = Kevin.xml_get_root(xmlDoc,"weapon/projectile/result");
+                        XmlNode xmlprojectiletrail = Kevin.xml_get_root(xmlDoc,"weapon/projectile/etrail");
+                        XmlNode xmlstance = Kevin.xml_get_root(xmlDoc,"weapon/stance");
+                        XmlNode xmlmodifier = Kevin.xml_get_root(xmlDoc, "weapon/modifier");
+                        //XmlNodeList xmlNodeList = xmlDoc.ChildNodes;
+                        if (xmlweapon != null)
+                        {
+                            Debug.WriteLine(xmlweapon);
+                            武器模型预览 wqmx = new 武器模型预览();
+                            wqmx.武器参数 = new 武器参数.weapon(); 
+                            wqmx.武器参数.tag = new 武器参数.weaponTag();
+                            wqmx.武器参数.specification = new 武器参数.weaponSpecification();
+                            wqmx.武器参数.next_in_chain = new 武器参数.weaponnext_in_chain();
+                            wqmx.武器参数.effect = new List<武器参数.weaponEffect>();
+                            Debug.WriteLine(Kevin.Xml_get_att(xmlweapon,"file"));
+                        
+                            wqmx.武器参数.file = Kevin.Xml_get_att(xmlweapon,"file");
+                            wqmx.武器参数.key = Kevin.Xml_get_att(xmlweapon, "key");
+                            wqmx.武器参数.quality = Kevin.Xml_get_att(xmlweapon, "quality");
+
+                            if (xmltag!=null)
+                            {
+                                wqmx.武器参数.tag.name = Kevin.Xml_get_att(xmltag, "name");
+                            }
+                            wqmx.武器参数.specification.retrigger_time = Kevin.Xml_get_att(xmlspecification, "retrigger_time");
+                            wqmx.武器参数.specification.accuracy_factor = Kevin.Xml_get_att(xmlspecification, "accuracy_factor");
+                            wqmx.武器参数.specification.spread_range = Kevin.Xml_get_att(xmlspecification, "spread_range");
+                            wqmx.武器参数.specification.sustained_fire_grow_step = Kevin.Xml_get_att(xmlspecification, "sustained_fire_grow_step");
+                            wqmx.武器参数.specification.sustained_fire_diminish_rate = Kevin.Xml_get_att(xmlspecification, "sustained_fire_diminish_rate");
+                            wqmx.武器参数.specification.magazine_size = Kevin.Xml_get_att(xmlspecification, "magazine_size");
+                            wqmx.武器参数.specification.can_shoot_standing = Kevin.Xml_get_att(xmlspecification, "can_shoot_standing");
+                            wqmx.武器参数.specification.suppressed = Kevin.Xml_get_att(xmlspecification, "suppressed");
+                            wqmx.武器参数.specification.name = Kevin.Xml_get_att(xmlspecification, "name");
+                            wqmx.武器参数.specification.Class = Kevin.Xml_get_att(xmlspecification, "class");
+                            wqmx.武器参数.specification.sight_range_modifier = Kevin.Xml_get_att(xmlspecification, "sight_range_modifier");
+                            wqmx.武器参数.specification.projectile_speed = Kevin.Xml_get_att(xmlspecification, "projectile_speed");
+                            wqmx.武器参数.specification.projectiles_per_shot = Kevin.Xml_get_att(xmlspecification, "projectiles_per_shot");
+                            wqmx.武器参数.next_in_chain.key = Kevin.Xml_get_att(next_in_chain, "retrigger_time");
+                            wqmx.武器参数.next_in_chain.share_ammo = Kevin.Xml_get_att(xmlspecification, "retrigger_time");
+                            var ls = new 武器参数.weaponEffect();
+                            ls.@ref = Kevin.Xml_get_att(xmleffect, "ref");
+                            ls.@class = Kevin.Xml_get_att(xmleffect, "class");
+                            wqmx.武器参数.effect.Add(ls);
+                            wqmx.模型ID.Text = wqmx.武器参数.key;
+                            if (wqmx.武器参数.key !=null)
+                            {
+                                武器列表.Children.Add(wqmx);
+                            }
+                            
+                            
+
+
+                        }
+                        else
+                        {
+                            Debug.WriteLine(item.FullName + "为不正常");
+                        }
+                        
+                        //XmlElement xmlElement = (XmlElement)xmlNodeList[0];
+                        //foreach (XmlNode ds in xmlNodeList)
+                        //{
+
+                        //    //XmlElement xmlElement = (XmlElement)ds;
+                        //    //var file = xmlElement.GetAttribute("file");
+                        //    //Attributes["id"].Value
+                           
+                        //        Debug.WriteLine(ds.Attributes["file"].Value);
+                            
+
+                        //}
+                    }
+                    
+                    
+                }
+            }
+            
+        }
+
+        private void 创建项目_Click(object sender, RoutedEventArgs e)
+        {
+            新建项目 是 = new 新建项目();
+            是.ShowDialog();
         }
     }
 }
