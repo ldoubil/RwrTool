@@ -24,6 +24,7 @@ namespace RwrTool
     {
         DispatcherTimer m_Timer1s = null; //定义1S计时器
         TimeSpan _timeSpan = new TimeSpan(0, 0, 0, 0, 0);
+        KevinTool.Json_Data.AllConfig allconfig = new();
         /// <summary>
         /// 状态
         /// </summary>
@@ -60,27 +61,7 @@ namespace RwrTool
         private void win_loaded(object sender, RoutedEventArgs e)
         {
 
-            
-         //   var jo = new JsonObject
-         //   {
-         //       ["Message"] = "个人信息",
-         //       ["Father"] = new JsonObject { ["Name"] = "张三" },
-         //       ["Son"] = new JsonArray(
-         //new JsonObject
-         //{
-         //    ["Name"] = "张小小",
-         //    ["Pet"] = new JsonArray("小花狗", "小花猫"),
-         //    ["Age"] = ""
-         //},
-         //new JsonObject
-         //{
-         //    ["Name"] = "张大大",
-         //    ["Pet"] = new JsonArray("小狼狗", "小公鸡"),
-         //    ["Age"] = 2
-         //})
-         //   };
-         //   var js = jo.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
-         //   Debug.WriteLine(js);
+        
 
         }
 
@@ -163,119 +144,41 @@ namespace RwrTool
         }
         private void 打开项目_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog l = new System.Windows.Forms.FolderBrowserDialog();
+            allconfig =  Kevin.读取项目(武器列表);
+            Debug.WriteLine("");
+            初始化项目();
 
-            if (l.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string txtFile = l.SelectedPath;
-                Debug.WriteLine(txtFile);
-                DirectoryInfo root = new DirectoryInfo(txtFile);
-                FileInfo[] fileStreams =  root.GetFiles();
-                foreach (var item in fileStreams)
-                {
+        }
 
-                    var ssss = System.IO.Path.GetExtension(item.FullName);
-                    if (ssss == ".weapon")
-                    {
-                        Debug.WriteLine(item.FullName);
-                        XmlDocument xmlDoc = new XmlDocument();
-                        XmlReaderSettings xmlReaderSettings = new XmlReaderSettings();
-                        xmlReaderSettings.IgnoreWhitespace = true;
-                        XmlReader xmlReader = XmlReader.Create(item.FullName, xmlReaderSettings);
-                        xmlDoc.Load(xmlReader);
-
-                        XmlNode xmlweapon = Kevin.xml_get_root(xmlDoc,"weapon");
-                        XmlNode xmltag = Kevin.xml_get_root(xmlDoc, "weapon/tag");
-                        XmlNode xmlspecification = Kevin.xml_get_root(xmlDoc, "weapon/specification");
-                        XmlNode next_in_chain = Kevin.xml_get_root(xmlDoc, "weapon/next_in_chain");
-                        XmlNode xmleffect = Kevin.xml_get_root(xmlDoc, "weapon/effect");
-                        XmlNode xmlanimation = Kevin.xml_get_root(xmlDoc,"weapon/animation");
-                        XmlNode xmlsound = Kevin.xml_get_root(xmlDoc,"weapon/sound");
-                        XmlNode xmlhud_icon = Kevin.xml_get_root(xmlDoc,"weapon/hud_icon");
-                        XmlNode xmlinventory = Kevin.xml_get_root(xmlDoc,"weapon/inventory");
-                        XmlNode xmlprojectile = Kevin.xml_get_root(xmlDoc,"weapon/projectile");
-                        XmlNode xmlprojectileresult = Kevin.xml_get_root(xmlDoc,"weapon/projectile/result");
-                        XmlNode xmlprojectiletrail = Kevin.xml_get_root(xmlDoc,"weapon/projectile/etrail");
-                        XmlNode xmlstance = Kevin.xml_get_root(xmlDoc,"weapon/stance");
-                        XmlNode xmlmodifier = Kevin.xml_get_root(xmlDoc, "weapon/modifier");
-                        //XmlNodeList xmlNodeList = xmlDoc.ChildNodes;
-                        if (xmlweapon != null)
-                        {
-                            Debug.WriteLine(xmlweapon);
-                            武器模型预览 wqmx = new 武器模型预览();
-                            wqmx.武器参数 = new 武器参数.weapon(); 
-                            wqmx.武器参数.tag = new 武器参数.weaponTag();
-                            wqmx.武器参数.specification = new 武器参数.weaponSpecification();
-                            wqmx.武器参数.next_in_chain = new 武器参数.weaponnext_in_chain();
-                            wqmx.武器参数.effect = new List<武器参数.weaponEffect>();
-                            Debug.WriteLine(Kevin.Xml_get_att(xmlweapon,"file"));
-                        
-                            wqmx.武器参数.file = Kevin.Xml_get_att(xmlweapon,"file");
-                            wqmx.武器参数.key = Kevin.Xml_get_att(xmlweapon, "key");
-                            wqmx.武器参数.quality = Kevin.Xml_get_att(xmlweapon, "quality");
-
-                            if (xmltag!=null)
-                            {
-                                wqmx.武器参数.tag.name = Kevin.Xml_get_att(xmltag, "name");
-                            }
-                            wqmx.武器参数.specification.retrigger_time = Kevin.Xml_get_att(xmlspecification, "retrigger_time");
-                            wqmx.武器参数.specification.accuracy_factor = Kevin.Xml_get_att(xmlspecification, "accuracy_factor");
-                            wqmx.武器参数.specification.spread_range = Kevin.Xml_get_att(xmlspecification, "spread_range");
-                            wqmx.武器参数.specification.sustained_fire_grow_step = Kevin.Xml_get_att(xmlspecification, "sustained_fire_grow_step");
-                            wqmx.武器参数.specification.sustained_fire_diminish_rate = Kevin.Xml_get_att(xmlspecification, "sustained_fire_diminish_rate");
-                            wqmx.武器参数.specification.magazine_size = Kevin.Xml_get_att(xmlspecification, "magazine_size");
-                            wqmx.武器参数.specification.can_shoot_standing = Kevin.Xml_get_att(xmlspecification, "can_shoot_standing");
-                            wqmx.武器参数.specification.suppressed = Kevin.Xml_get_att(xmlspecification, "suppressed");
-                            wqmx.武器参数.specification.name = Kevin.Xml_get_att(xmlspecification, "name");
-                            wqmx.武器参数.specification.Class = Kevin.Xml_get_att(xmlspecification, "class");
-                            wqmx.武器参数.specification.sight_range_modifier = Kevin.Xml_get_att(xmlspecification, "sight_range_modifier");
-                            wqmx.武器参数.specification.projectile_speed = Kevin.Xml_get_att(xmlspecification, "projectile_speed");
-                            wqmx.武器参数.specification.projectiles_per_shot = Kevin.Xml_get_att(xmlspecification, "projectiles_per_shot");
-                            wqmx.武器参数.next_in_chain.key = Kevin.Xml_get_att(next_in_chain, "retrigger_time");
-                            wqmx.武器参数.next_in_chain.share_ammo = Kevin.Xml_get_att(xmlspecification, "retrigger_time");
-                            var ls = new 武器参数.weaponEffect();
-                            ls.@ref = Kevin.Xml_get_att(xmleffect, "ref");
-                            ls.@class = Kevin.Xml_get_att(xmleffect, "class");
-                            wqmx.武器参数.effect.Add(ls);
-                            wqmx.模型ID.Text = wqmx.武器参数.key;
-                            if (wqmx.武器参数.key !=null)
-                            {
-                                武器列表.Children.Add(wqmx);
-                            }
-                            
-                            
-
-
-                        }
-                        else
-                        {
-                            Debug.WriteLine(item.FullName + "为不正常");
-                        }
-                        
-                        //XmlElement xmlElement = (XmlElement)xmlNodeList[0];
-                        //foreach (XmlNode ds in xmlNodeList)
-                        //{
-
-                        //    //XmlElement xmlElement = (XmlElement)ds;
-                        //    //var file = xmlElement.GetAttribute("file");
-                        //    //Attributes["id"].Value
-                           
-                        //        Debug.WriteLine(ds.Attributes["file"].Value);
-                            
-
-                        //}
-                    }
-                    
-                    
-                }
-            }
+        private void 初始化项目()
+        {
+            //进入武器目录读取武器
             
+            DirectoryInfo directoryInfo = new DirectoryInfo(allconfig.xm + "/weapons");
+            FileInfo[] fileInfos = directoryInfo.GetFiles();
+            foreach (var item in fileInfos)
+            {
+                if (Path.GetExtension(item.FullName) == ".weapon")
+                {
+                    Debug.WriteLine(item.FullName);
+                }
+                
+            }
+
         }
 
         private void 创建项目_Click(object sender, RoutedEventArgs e)
         {
-            新建项目 是 = new 新建项目();
-            是.ShowDialog();
+            新建项目 s = new 新建项目();
+            s.ShowDialog();
+            if(s.allconfig != null)
+            {
+                Debug.WriteLine(s.allconfig);
+                allconfig = s.allconfig;
+            }
         }
+
+
+        
     }
 }

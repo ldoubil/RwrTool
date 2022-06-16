@@ -44,12 +44,14 @@
                         <MenuItem Header="文件">
                             <MenuItem
                                 x:Name="创建项目"
+                                Click="创建项目_Click"
                                 Header="创建项目"
-                                Icon="{materialDesign:PackIcon Kind=FileStar}" Click="创建项目_Click" />
+                                Icon="{materialDesign:PackIcon Kind=FileStar}" />
                             <MenuItem
                                 x:Name="打开项目"
+                                Click="打开项目_Click"
                                 Header="打开项目"
-                                Icon="{materialDesign:PackIcon Kind=FileDocumentOutline}" Click="打开项目_Click" />
+                                Icon="{materialDesign:PackIcon Kind=FileDocumentOutline}" />
                             <MenuItem
                                 Click="MenuItem_Click"
                                 Header="打开模型"
@@ -144,7 +146,7 @@
                         Background="#FF4E4E4E"
                         SnapsToDevicePixels="True"
                         Style="{StaticResource MaterialDesignNavigationRailTabControl}"
-                        TabStripPlacement="Left" >
+                        TabStripPlacement="Left">
 
                         <TabItem>
                             <TabItem.Header>
@@ -158,13 +160,11 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <!--  武器列表  -->
-                           
+
                             <ScrollViewer Margin="0" VerticalScrollBarVisibility="Auto">
-                                
-                                <WrapPanel Name="武器列表">
-                                    
-                                </WrapPanel>
-                                
+
+                                <WrapPanel Name="武器列表" />
+
                             </ScrollViewer>
 
 

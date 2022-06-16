@@ -26,13 +26,20 @@
                         输入项目名
                     </Label>
                     <TextBox
+                        x:Name="项目名"
                         Grid.Row="1"
                         Margin="0,12,0,0"
                         Cursor="Arrow"
                         Text="Name... ..." />
                     <StackPanel x:Name="url_list" />
-                    <Button Content="添加项目资源路径" Click="Button_Click" />
+                    <Button Click="Button_Click" Content="添加项目资源路径" />
                     <TextBlock>项目资源路径应包括Vanilla目录 和 制作的模组目录,如果基于别的模组制作还要添加别的模组目录进去!</TextBlock>
+                    <TextBlock x:Name="项目路径" />
+                    <Button
+                        x:Name="add项目路径"
+                        Click="add项目路径_Click"
+                        Content="添加项目路径" />
+
                 </StackPanel>
             </Grid>
 
@@ -49,15 +56,18 @@
                     Margin="-1,0,0,0"
                     Padding="40,4,40,4"
                     HorizontalAlignment="Center"
-                    Content="取消"
+                    Content="取消创建"
+                    Cursor="Hand"
                     IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                     Style="{StaticResource MaterialDesignRaisedButton}"
-                    ToolTip="Resource name: MaterialDesignRaisedButton" />
+                    ToolTip="Resource name: MaterialDesignRaisedButton" Click="Button_Click_2" />
                 <Button
                     Grid.Column="1"
                     Padding="40,4,40,8"
                     HorizontalAlignment="Center"
-                    Content="创建"
+                    Click="Button_Click_1"
+                    Content="保存并创建"
+                    Cursor="Hand"
                     IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                     Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
                     ToolTip="Resource name: MaterialDesignRaisedSecondaryButton" />
